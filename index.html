@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blood Group Predictor | By Benedict Otunga</title>
+<style>
+  *{box-sizing:border-box}
+  body{font-family:Arial,sans-serif;background:#f0f7f1;margin:0;padding:0;color:#1a2e1a}
+  header{background:#0f5d2e;color:white;padding:30px 20px;text-align:center}
+  header h1{margin:0;font-size:32px}
+  header p{margin:8px 0 0;opacity:.9}
+  .container{max-width:750px;margin:20px auto;padding:0 15px}
+  .card{background:white;padding:22px;border-radius:16px;box-shadow:0 4px 18px rgba(0,0,0,.07);margin-bottom:20px;border:1px solid #d6ead9}
+  .card h2{color:#0f5d2e;margin-top:0}
+  label{font-weight:bold;display:block;margin-top:14px}
+  select{width:100%;padding:12px;margin-top:6px;border-radius:10px;border:1.5px solid #c8e6cd;font-size:16px;background:#f9fff9}
+  button{width:100%;padding:14px;background:#0f5d2e;color:white;border:none;border-radius:12px;font-size:18px;margin-top:18px;cursor:pointer;font-weight:bold}
+  button:hover{background:#0a4420}
+  #result,#donorResult{margin-top:16px;padding:15px;background:#eaf7ec;border-radius:12px;display:none}
+  .bar{height:18px;background:#1a9a4a;border-radius:10px;margin:5px 0 10px}
+  .tag{display:inline-block;background:#0f5d2e;color:white;padding:6px 12px;border-radius:20px;margin:3px;font-weight:bold}
+  .tag.red{background:#eef7ef;color:#0f5d2e;border:1px solid #0f5d2e}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:600px){.grid{grid-template-columns:1fr}}
+  table{width:100%;border-collapse:collapse;margin-top:10px}
+  th,td{padding:10px;border-bottom:1px solid #eee;text-align:left}
+  th{background:#0f5d2e;color:white}
+  small{color:#666;line-height:1.5;display:block;text-align:center;margin-top:10px}
+  footer{background:#0f5d2e;color:white;text-align:center;padding:20px 15px;margin-top:30px}
+  footer b{font-size:18px}
+  footer p{margin:5px 0;opacity:.9;font-size:14px}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🩸 Blood Group Predictor</h1>
+  <p>Predict Possible Blood Group • Check Who You Can Donate To</p>
+</header>
+
+<div class="container">
+
+  <!-- 1. PREDICTOR -->
+  <div class="card">
+    <h2>1. Predict Child's Blood Group</h2>
+    <p>Select parents' blood groups to see possible blood groups for the child.</p>
+    <div class="grid">
+      <div>
+        <label>Mother's Blood Group</label>
+        <select id="mum">
+          <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
+          <option>AB+</option><option>AB-</option><option>O+</option><option>O-</option>
+        </select>
+      </div>
+      <div>
+        <label>Father's Blood Group</label>
+        <select id="dad">
+          <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
+          <option>AB+</option><option>AB-</option><option>O+</option><option>O-</option>
+        </select>
+      </div>
+    </div>
+    <button onclick="predict()">Predict Now</button>
+    <div id="result"></div>
+  </div>
+
+  <!-- 2. DONATION CHECKER -->
+  <div class="card">
+    <h2>2. Blood Donation Compatibility Checker</h2>
+    <p>Select YOUR blood group to see who you can give to and receive from.</p>
+    <label>Your Blood Group</label>
+    <select id="myType">
+      <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
+      <option>AB+</option><option>AB-</option><option>O+</option><option>O-</option>
+    </select>
+    <button onclick="checkDonor()">Check Compatibility</button>
+    <div id="donorResult"></div>
+  </div>
+
+  <!-- 3. CHART -->
+  <div class="card">
+    <h2>3. Quick Compatibility Chart</h2>
+    <table>
+      <tr><th>Blood Type</th><th>Can Donate To</th><th>Can Receive From</th></tr>
+      <tr><td><b>O-</b></td><td>Everyone (Universal Donor)</td><td>O-</td></tr>
+      <tr><td><b>O+</b></td><td>O+, A+, B+, AB+</td><td>O+, O-</td></tr>
+      <tr><td><b>A-</b></td><td>A+, A-, AB+, AB-</td><td>A-, O-</td></tr>
+      <tr><td><b>A+</b></td><td>A+, AB+</td><td>A+, A-, O+, O-</td></tr>
+      <tr><td><b>B-</b></td><td>B+, B-, AB+, AB-</td><td>B-, O-</td></tr>
+      <tr><td><b>B+</b></td><td>B+, AB+</td><td>B+, B-, O+, O-</td></tr>
+      <tr><td><b>AB-</b></td><td>AB+, AB-</td><td>AB-, A-, B-, O-</td></tr>
+      <tr><td><b>AB+</b></td><td>AB+ only</td><td>Everyone (Universal Receiver)</td></tr>
+    </table>
+    <small>⚠️ This website is for education only. For blood donation, transfusion or medical decisions, always do a lab blood test and talk to a doctor / lab tech.</small>
+  </div>
+
+</div>
+
+<footer>
+  <b>Built by Benedict Otunga</b>
+  <p>Digital Creator & Developer | Eldoret, Kenya</p>
+  <p>by Benedict Otunga © 2026 - Let's Build Something Great</p>
+</footer>
+
+<script>
+const ABO = {"A":["A","O"],"B":["B","O"],"AB":["A","B"],"O":["O","O"]};
+function predict(){
+  let mum=document.getElementById("mum").value;
+  let dad=document.getElementById("dad").value;
+  let mumABO=mum.replace("+","").replace("-","");
+  let dadABO=dad.replace("+","").replace("-","");
+  let mumRh=mum.includes("+")?"pos":"neg";
+  let dadRh=dad.includes("+")?"pos":"neg";
+  let combos={};
+  ABO[mumABO].forEach(m=>{ ABO[dadABO].forEach(d=>{
+    let type="O";
+    if((m=="A"&&d=="B")||(m=="B"&&d=="A")) type="AB";
+    else if(m=="O"&&d=="O") type="O";
+    else if(m=="O") type=d; else if(d=="O") type=m; else type=m;
+    combos[type]=(combos[type]||0)+1;
+  })});
+  let rhText=(mumRh=="neg"&&dadRh=="neg")?"Child will be Rh Negative (-)":"Child can be Rh Positive (+) or Rh Negative (-) - Positive is more likely";
+  let html=`<h3>Possible Blood Groups for Child:</h3>`;
+  let total=Object.values(combos).reduce((a,b)=>a+b,0);
+  for(let k in combos){
+    let pct=Math.round((combos[k]/total)*100);
+    html+=`<b>${k}</b> - ${pct}% chance <div class="bar" style="width:${pct}%"></div>`;
+  }
+  html+=`<p><b>Rh Factor:</b> ${rhText}</p><p>Mum ${mum} + Dad ${dad} = Child could be <b>${Object.keys(combos).join(", ")}</b></p>`;
+  let r=document.getElementById("result"); r.innerHTML=html; r.style.display="block";
+}
+const donateTo={"O-":["O-","O+","A-","A+","B-","B+","AB-","AB+"],"O+":["O+","A+","B+","AB+"],"A-":["A-","A+","AB-","AB+"],"A+":["A+","AB+"],"B-":["B-","B+","AB-","AB+"],"B+":["B+","AB+"],"AB-":["AB-","AB+"],"AB+":["AB+"]};
+const receiveFrom={"O-":["O-"],"O+":["O+","O-"],"A-":["A-","O-"],"A+":["A+","A-","O+","O-"],"B-":["B-","O-"],"B+":["B+","B-","O+","O-"],"AB-":["AB-","A-","B-","O-"],"AB+":["AB+","AB-","A+","A-","B+","B-","O+","O-"]};
+function checkDonor(){
+  let t=document.getElementById("myType").value;
+  let html=`<h3>Your Blood Group: ${t}</h3>`;
+  html+=`<p><b>You Can Donate To:</b><br>${donateTo[t].map(x=>`<span class="tag">${x}</span>`).join("")}</p>`;
+  html+=`<p><b>You Can Receive From:</b><br>${receiveFrom[t].map(x=>`<span class="tag red">${x}</span>`).join("")}</p>`;
+  if(t=="O-") html+=`<p>🌟 You are a <b>Universal Donor</b> - your blood can help everyone!</p>`;
+  if(t=="AB+") html+=`<p>🌟 You are a <b>Universal Receiver</b> - you can receive from everyone!</p>`;
+  let r=document.getElementById("donorResult"); r.innerHTML=html; r.style.display="block";
+}
+</script>
+</body>
+</html>
